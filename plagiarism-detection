@@ -1,0 +1,52 @@
+import java.util.*;
+
+class PlagiarismDetection {
+
+    public static String RabinKarpAlgorithm(String text, String pattern) {
+        int m = text.length();
+        int n = pattern.length();
+        int d = 256;
+        int prime = 101;
+
+        if(n > m) return "No plagiarism detected"; // pattern longer than text
+
+        int x = 1; // d^(n-1)
+        for(int i = 0; i < n - 1; i++) x = (x * d) % prime;
+
+        int t = 0; // hash of current window
+        int p = 0; // hash of pattern
+
+        // Initial hash
+        for(int i = 0; i < n; i++) {
+            t = (t * d + text.charAt(i)) % prime;
+            p = (p * d + pattern.charAt(i)) % prime;
+        }
+
+        // Slide pattern over text
+        for(int i = 0; i <= m - n; i++) {
+            if(t == p) {
+                int j;
+                for(j = 0; j < n; j++) {
+                    if(text.charAt(i + j) != pattern.charAt(j)) break;
+                }
+                if(j == n) return "Plagiarism detected!";
+            }
+            // Rolling hash
+            if(i < m - n) {
+                t = (d * (t - text.charAt(i) * x) + text.charAt(i + n)) % prime;
+                t = (t + prime) % prime; // ensure positive
+            }
+        }
+        return "No plagiarism detected";
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the text:");
+        String text = sc.nextLine();
+        System.out.println("Enter the pattern to check:");
+        String pattern = sc.nextLine();
+
+        System.out.println(RabinKarpAlgorithm(text, pattern));
+    }
+}
